@@ -7,6 +7,7 @@ from RankIt import *
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/RankIt'
+app.config['SECRET_KEY'] = 'biubiubiuhaoyu'
 
 db = SQLAlchemy(app)
 

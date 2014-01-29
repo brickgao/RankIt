@@ -1,0 +1,25 @@
+html, 
+body {
+  height: 100%;
+}
+
+#wrap {
+   min-height: 100%;
+   height: auto;
+   margin: 0 auto -60px;
+   padding: 0 0 60px;
+}
+
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+.container .text-muted {
+  margin: 20px 0;
+  max-width: 680px;
+  padding: 0 15px;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
