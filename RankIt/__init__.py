@@ -13,6 +13,7 @@ db = SQLAlchemy(app)
 from models.admin import admin
 from models.normalRec import normalRec
 from models.normalEvent import normalEvent
+from models.normalEventRules import normalEventRules
 from models.user import user
 from models.wakeupEvent import wakeupEvent
 from models.wakeupRec import wakeupRec
