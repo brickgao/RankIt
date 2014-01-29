@@ -4,23 +4,23 @@ from RankIt import db
 
 class normalRec(db.Model):
 
-    __tablename__ = 'normal_rec'
-    _id           = db.Column(db.Integer, primary_key=True)
-    userId        = db.Column(db.Integer, db.ForeignKey('user.id'))
-    eventId       = db.Column(db.Integer, db.ForeignKey('normal_event.id'))
-    rank          = db.Column(db.Integer, unique=False)
-    user          = db.relationship('user',
-                                    primaryjoin='normal_rec.userId == user.id',
-                                    backref=db.backref('normal_rec', order_by='normal_rec.userId'))
-    normalEvent   = db.relationship('normalEvent',
-                                    primaryjoin='normal_rec.eventId == normal_event.id',
-                                    backref=db.backref('normal_rec'))
+    __tablename__  = 'normal_rec'
+    _id            = db.Column(db.Integer, primary_key=True)
+    user_id        = db.Column(db.Integer, db.ForeignKey('user.id'))
+    event_id       = db.Column(db.Integer, db.ForeignKey('normal_event.id'))
+    rank           = db.Column(db.Integer, unique=False)
+    user           = db.relationship('user',
+                                     primaryjoin='normalRec.user_id == user.id',
+                                     backref=db.backref('normal_rec', order_by='normalRec.user_id'))
+    normal_event  = db.relationship('normalEvent',
+                                     primaryjoin='normalRec.event_id == normalEvent.id',
+                                     backref=db.backref('normal_rec'))
 
 
-    def __init__(self, userId, eventId, rank):
+    def __init__(self, user_id, event_id, rank):
         
-        self.userId  = userId
-        self.eventId = eventId
+        self.user_id  = user_id
+        self.event_id = event_id
         self.rank    = rank
         
 
