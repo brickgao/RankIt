@@ -5,7 +5,7 @@ from RankIt import db
 class admin(db.Model):
     
     username = db.Column(db.String(80), primary_key=True)
-    passwd   = db.Column(db.String(80), unique=False)
+    passwd   = db.Column(db.String(250), unique=False)
 
 
     def __init__(self, username, passwd):
