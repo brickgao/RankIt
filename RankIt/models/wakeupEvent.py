@@ -8,20 +8,25 @@ class wakeupEvent(db.Model):
     last_update_time = db.Column(db.String(80), unique=False)
     total            = db.Column(db.Integer, unique=False)
     switch           = db.Column(db.Integer, unique=False)
-    early_ret        = db.Column(db.String(250), unique=False)
-    late_ret         = db.Column(db.String(250), unique=False)
-    off_ret          = db.Column(db.String(250), unique=False)
-    acc_ret_part1    = db.Column(db.String(250), unique=False)
-    acc_ret_part2    = db.Column(db.String(250), unique=False)
+    begin_time       = db.Column(db.String(80), unique=False)
+    end_time         = db.Column(db.String(80), unique=False)
+    early_ret        = db.Column(db.Text, unique=False)
+    late_ret         = db.Column(db.Text, unique=False)
+    off_ret          = db.Column(db.Text, unique=False)
+    acc_ret          = db.Column(db.Text, unique=False)
+    done_ret         = db.Column(db.Text, unique=False)
 
 
-    def __init__(self, id, last_update_time, total, switch, early_ret, late_ret, off_ret, acc_ret_part1, acc_ret_part2):
+    def __init__(self, last_update_time, total, begin_time, end_time, early_ret, late_ret, off_ret, acc_ret, done_ret):
         
-        self.id               = id
+        self.id               = 1
         self.last_update_time = last_update_time
         self.total            = total
-        self.switch           = switch
+        self.switch           = 1
+        self.begin_time       = begin_time
+        self.end_time         = end_time
         self.early_ret        = early_ret
+        self.late_ret         = late_ret
         self.off_ret          = off_ret
-        self.acc_ret_part1    = acc_ret_part1
-        self.acc_ret_part2    = acc_ret_part2
+        self.acc_ret          = acc_ret
+        self.done_ret         = done_ret

@@ -10,9 +10,7 @@
     {% if success %}
     <div class="alert alert-success alert-dismissable">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        {%- for msg in success %}
-          {{ msg }}
-        {% endfor -%}
+        {{success[0]}}
       </div>
     {% endif %}
     {% endwith %}
@@ -20,9 +18,7 @@
     {% if error  %}
      <div class="alert alert-danger alert-dismissable">
        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        {%- for msg in error %}
-          {{ msg }}
-        {% endfor -%}
+         {{error[0]}}
      </div>
     {% endif %}
     {% endwith %}

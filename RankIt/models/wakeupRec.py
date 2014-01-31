@@ -4,13 +4,18 @@ from RankIt import db
 
 class wakeupRec(db.Model):
 
-    id               = db.Column(db.Integer, primary_key=True)
+    __tablename__    = 'wakeup_rec'
+    _id              = db.Column(db.Integer, primary_key=True)
+    user_id          = db.Column(db.Integer, db.ForeignKey('user.id'))
     rank             = db.Column(db.Integer, unique=False)
-    last_update_time = db.Column(db.String(80), unique=False)
+    create_time      = db.Column(db.String(80), unique=False)
+    user             = db.relationship('user',
+                                       primaryjoin='wakeupRec.user_id == user.id',
+                                       backref=db.backref('wakeup_rec'), order_by='wakeupRec.user_id')
 
 
-    def __init__(self, id, rank, last_update_time):
+    def __init__(self, user_id, rank, create_time):
         
-        self.id               = id
+        self.user_id          = user_id
         self.rank             = rank
-        self.last_update_time = last_update_time
+        self.create_time      = create_time

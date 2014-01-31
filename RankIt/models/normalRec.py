@@ -12,7 +12,7 @@ class normalRec(db.Model):
     user           = db.relationship('user',
                                      primaryjoin='normalRec.user_id == user.id',
                                      backref=db.backref('normal_rec', order_by='normalRec.user_id'))
-    normal_event  = db.relationship('normalEvent',
+    normal_event   = db.relationship('normalEvent',
                                      primaryjoin='normalRec.event_id == normalEvent.id',
                                      backref=db.backref('normal_rec'))
 
