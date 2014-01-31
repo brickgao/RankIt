@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from RankIt import db
+import hashlib
 
 class normalEventRules(db.Model):
 
     __tablename__ = 'normal_event_rules'
-    _id           = db.Column(db.Integer, primary_key=True)
+    _id           = db.Column(db.String(250), primary_key=True)
     event_id      = db.Column(db.Integer, db.ForeignKey('normal_event.id'))
     normal_event  = db.relationship('normalEvent',
                                     primaryjoin='normalEventRules.event_id == normalEvent.id',
@@ -18,6 +19,8 @@ class normalEventRules(db.Model):
 
     def __init__(self, event_id, rule_type, reg, range_begin, range_end):
 
+        self._id         = hashlib.sha512(str(event_id) + 'and' + str(range_begin) + \
+                           'and' + str(range_end) + 'and' + reg).hexdigest()
         self.event_id    = event_id
         self.rule_type   = rule_type
         self.reg         = reg

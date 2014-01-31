@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from RankIt import db
+import hashlib
 
 class normalRec(db.Model):
 
@@ -19,6 +20,7 @@ class normalRec(db.Model):
 
     def __init__(self, user_id, event_id, rank):
         
+        self._id      = hashlib.sha512(str(user_id) + 'and' + str(event_id)).hexdigest()
         self.user_id  = user_id
         self.event_id = event_id
         self.rank    = rank

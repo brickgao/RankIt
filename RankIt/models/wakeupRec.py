@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from RankIt import db
+import hashlib
 
 class wakeupRec(db.Model):
 
@@ -16,6 +17,7 @@ class wakeupRec(db.Model):
 
     def __init__(self, user_id, rank, create_time):
         
+        self._id              = hashlib.sha512(create_time + 'and' + str(user_id)).hexdigest()
         self.user_id          = user_id
         self.rank             = rank
         self.create_time      = create_time
