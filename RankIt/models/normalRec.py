@@ -6,7 +6,7 @@ import hashlib
 class normalRec(db.Model):
 
     __tablename__  = 'normal_rec'
-    _id            = db.Column(db.Integer, primary_key=True)
+    _id            = db.Column(db.String(250), primary_key=True)
     user_id        = db.Column(db.Integer, db.ForeignKey('user.id'))
     event_id       = db.Column(db.Integer, db.ForeignKey('normal_event.id'))
     rank           = db.Column(db.Integer, unique=False)
