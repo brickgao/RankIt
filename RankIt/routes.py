@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from RankIt import *
-from flask import Flask, render_template, request, flash, redirect, abort
+from flask import Flask, render_template, request, flash, redirect, abort, session
 from models.admin import admin
 from models.wakeupEvent import wakeupEvent
 from models.user import user
@@ -151,8 +151,25 @@ def reflectReq():
 
 @app.route('/manage', methods=['GET'])
 def manageIndex():
-    adminInfo = admin.query.filter_by(username='admin').first()
-    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
-    if not adminInfo or not wakeupEventInfo:
-        return redirect('/init')
     return render_template('manage_index.html')
+
+@app.route('/manage/login', methods=['GET', 'POST'])
+def manageLogin():
+    if request.method == 'GET':
+        return render_template('manage_login.html')
+    else:
+        adminInfo = admin.query.filter_by(username='admin').first()
+        _passwd = hashlib.sha512('biu' + request.form['passwd']).hexdigest()
+        if _passwd == adminInfo.passwd:
+            session['username'] = 'admin'
+            flash(u'欢迎回来，admin', 'success')
+            return redirect('/manage')
+        else:
+            flash(u'密码错误', 'error')
+            return redirect('/manage/login')
+
+@app.route('/manage/logout')
+def manageLogout():
+    session.pop('username', None)
+    flash(u'登出成功', 'success')
+    return redirect('/manage')
