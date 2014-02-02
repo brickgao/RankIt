@@ -14,7 +14,6 @@ def getMainIndex():
 def getInitIndex():
     adminInfo = admin.query.filter_by(username='admin').first()
     wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
-    print wakeupEventInfo
     if not adminInfo or not wakeupEventInfo:
         return render_template('init_begin.html')
     else:
@@ -72,8 +71,18 @@ def initStepTwo():
                 wakeupEventInfo = wakeupEvent('1970-1-1', 0, begin_time, end_time, early_ret, late_ret, off_ret, acc_ret, done_ret)
                 db.session.add(wakeupEventInfo)
                 db.session.commit()
-                return 'success'
+                return redirect('/init/done')
             else:
                 flash(u'请设置合法时间或者结束时间大于开始时间', 'error')
                 return redirect('/init/step2')
+
+@app.route('/init/done', methods=['GET'])
+def initDone():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if adminInfo and wakeupEventInfo:
+        if request.method == 'GET':
+            return render_template('init_done.html')
+    else:
+        return redirect('/init/step1')
 
