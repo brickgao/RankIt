@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from RankIt import *
-from flask import Flask, render_template, request, flash, redirect
+from flask import Flask, render_template, request, flash, redirect, abort
 from models.admin import admin
 from models.wakeupEvent import wakeupEvent
-import hashlib, time_misc
+from models.user import user
+from models.wakeupRec import wakeupRec
+import hashlib, time, time_misc, str_misc
 
 @app.route('/', methods=['GET'])
 def getMainIndex():
@@ -86,3 +88,52 @@ def initDone():
     else:
         return redirect('/init/step1')
 
+@app.route('/req', methods=['GET'])
+def reflectReq():
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not wakeupEventInfo:
+        return redirect('/init')
+    _event = request.args.get('event')
+    if _event:
+        if _event == 'wakeup':
+            try:
+                _id = int(request.args.get('id'))
+            except Exception, e:
+                return abort(404)
+            userInfo = user.query.filter_by(id=_id).first()
+            if not userInfo:
+                userInfo = user(_id, '')
+                db.session.add(userInfo)
+                db.session.commit()
+            _date = time.strftime("%Y-%m-%d", time.localtime())
+            _time = time.strftime('%H:%M',time.localtime())
+            _time = '13:13'
+            # Return transed off_ret if switch is off
+            if not wakeupEventInfo.switch:
+                _ret = str_misc.trans_str(wakeupEventInfo.off_ret, _time)
+                return _ret
+            wakeupRecInfo = wakeupRec.query.filter_by(user_id=_id, create_date=_date).first()
+            if not wakeupRecInfo:
+                # Return early_ret if user hasn't checked and time is earlier than the begin time
+                if time_misc.check_double_time(_time, wakeupEventInfo.begin_time):
+                    _ret = str_misc.trans_str(wakeupEventInfo.early_ret, _time)
+                    return _ret
+                # Return late_ret if user hasn't checked and time is later than the begin time
+                if time_misc.check_double_time(wakeupEventInfo.end_time, _time):
+                    _ret = str_misc.trans_str(wakeupEventInfo.late_ret, _time)
+                    return _ret
+                # Return acc_ret if all thing is right
+                _rank = wakeupEventInfo.total + 1
+                wakeupRecInfo = wakeupRec(_id, _rank, _date, _time)
+                wakeupEventInfo.total = _rank
+                db.session.add(wakeupRecInfo)
+                db.session.commit()
+                _ret = str_misc.trans_str(wakeupEventInfo.acc_ret, _time, _time, str(_rank))
+                return _ret
+            else:
+            # Return done_ret if user has checked in wakeupEvent
+                _ret = str_misc.trans_str(wakeupEventInfo.done_ret, _time, wakeupRecInfo.create_time, str(wakeupRecInfo.rank))
+                return _ret
+        if _event == 'normal':
+            return 'normal event'
+    return abort(404)
