@@ -5,7 +5,7 @@ from RankIt import db
 class user(db.Model):
     
     id       = db.Column(db.Integer, primary_key=True)
-    nickname = db.Column(db.String(80), unique=True) # reversed for new API
+    nickname = db.Column(db.String(80), unique=False) # reversed for new API
 
 
     def __init__(self, id, nickname):

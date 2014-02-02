@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock title %} - RankIt</title>
+
+    
+    <!-- Bootstrap core CSS -->
+    <link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+                                      
+    <!-- Custom styles for this template -->
+    <link href="{{url_for('static', filename='css/manage_base.css')}}" rel="stylesheet">
+
+  </head>
+
+  <body>
+    
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/manage">RankIt</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/manage">主页</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">起床签到任务<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">概况</a></li>
+                <li><a href="#">查询</a></li>
+                <li><a href="#">设置</a></li>
+              </ul>
+            </li>
+            <li><a href="#">普通签到任务</a></li>
+          </ul>
+          {% if user %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">{{ user }}</a></li>
+                <li><a href="/manage/logout">退出</a></li>
+            </ul>
+          {% endif %}
+          {% if not user %}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/manage/login">登录</a></li>
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="container">
+    {% with success = get_flashed_messages(category_filter=["success"]) %}
+    {% if success %}
+    <div class="alert alert-success alert-dismissable">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{success[0]}}
+      </div>
+    {% endif %}
+    {% endwith %}
+    {% with error = get_flashed_messages(category_filter=["error"]) %}
+    {% if error  %}
+     <div class="alert alert-danger alert-dismissable">
+       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+         {{error[0]}}
+     </div>
+    {% endif %}
+    {% endwith %}
+    </div>
+    
+    {% block content %}
+    {% endblock content %}
+
+    <hr>
+
+    <div class="container">
+      <div class="footer">
+        <p>&copy; RankIt 2013</p>
+      </div>
+    </div>
+    <script src="{{url_for('static', filename='js/jquery-2.1.0.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+  </body>
+</html>
+
+            
+  
+

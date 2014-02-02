@@ -10,6 +10,10 @@ import hashlib, time, time_misc, str_misc
 
 @app.route('/', methods=['GET'])
 def getMainIndex():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     return 'RankIt is running'
 
 @app.route('/init', methods=['GET'])
@@ -90,8 +94,9 @@ def initDone():
 
 @app.route('/req', methods=['GET'])
 def reflectReq():
+    adminInfo = admin.query.filter_by(username='admin').first()
     wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
-    if not wakeupEventInfo:
+    if not adminInfo or not wakeupEventInfo:
         return redirect('/init')
     _event = request.args.get('event')
     if _event:
@@ -106,6 +111,7 @@ def reflectReq():
                 db.session.add(userInfo)
                 db.session.commit()
             _date = time.strftime("%Y-%m-%d", time.localtime())
+            _date = '2014-2-3'
             _time = time.strftime('%H:%M',time.localtime())
             _time = '13:13'
             # Return transed off_ret if switch is off
@@ -123,9 +129,14 @@ def reflectReq():
                     _ret = str_misc.trans_str(wakeupEventInfo.late_ret, _time)
                     return _ret
                 # Return acc_ret if all thing is right
-                _rank = wakeupEventInfo.total + 1
+                if wakeupEventInfo.last_update_time == _date:
+                    _rank = wakeupEventInfo.total + 1
+                    wakeupEventInfo.total = _rank
+                else:
+                    _rank = 1
+                    wakeupEventInfo.last_update_time = _date
+                    wakeupEventInfo.total = _rank
                 wakeupRecInfo = wakeupRec(_id, _rank, _date, _time)
-                wakeupEventInfo.total = _rank
                 db.session.add(wakeupRecInfo)
                 db.session.commit()
                 _ret = str_misc.trans_str(wakeupEventInfo.acc_ret, _time, _time, str(_rank))
@@ -137,3 +148,11 @@ def reflectReq():
         if _event == 'normal':
             return 'normal event'
     return abort(404)
+
+@app.route('/manage', methods=['GET'])
+def manageIndex():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
+    return render_template('manage_index.html')
