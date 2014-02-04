@@ -1,0 +1,28 @@
+{% extends "manage_base.html" %}
+{% block title %}查询结果 - 起床签到任务{% endblock %}
+{% block content %}
+<div class = "container">
+  <legend>查询结果 - 起床签到任务</legend>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>签到日期</th>
+        <th>当日排名</th>
+        <th>签到时间</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    {% for e in info %}
+    <tr>
+      <th>{{ e['id'] }}</th>
+      <th>{{ e['create_date'] }}</th>
+      <th>{{ e['rank'] }}</th>
+      <th>{{ e['create_time'] }}</th>
+      <th>{{ e['user_id']}}</th>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
+

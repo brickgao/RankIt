@@ -6,7 +6,7 @@ from models.admin import admin
 from models.wakeupEvent import wakeupEvent
 from models.user import user
 from models.wakeupRec import wakeupRec
-import hashlib, time, time_misc, str_misc
+import hashlib, time, time_misc, str_misc, date_misc
 
 @app.route('/', methods=['GET'])
 def getMainIndex():
@@ -79,7 +79,7 @@ def initStepTwo():
                 db.session.commit()
                 return redirect('/init/done')
             else:
-                flash(u'请设置合法时间或者结束时间大于开始时间', 'error')
+                flash(u'时间不合法或者结束时间大于开始时间', 'error')
                 return redirect('/init/step2')
 
 @app.route('/init/done', methods=['GET'])
@@ -112,7 +112,6 @@ def reflectReq():
                 db.session.commit()
             _date = time.strftime("%Y-%m-%d", time.localtime())
             _time = time.strftime('%H:%M',time.localtime())
-            _time = '13:13'
             # Return transed off_ret if switch is off
             if not wakeupEventInfo.switch:
                 _ret = str_misc.trans_str(wakeupEventInfo.off_ret, _time)
@@ -238,5 +237,48 @@ def wakeupSettings():
                     flash(u'修改成功', 'success')
                     return redirect('/manage/wakeup_event/summary')
                 else:
-                    flash(u'请设置合法时间或者结束时间大于开始时间', 'error')
+                    flash(u'时间不合法或者结束时间大于开始时间', 'error')
                     return redirect('/manage/wakeup_event/settings')
+
+@app.route('/manage/wakeup_event/search', methods=['GET'])
+def wakeupSearch():
+    return render_template('manage_wakeup_search.html')
+
+@app.route('/manage/wakeup_event/search_result', methods=['GET'])
+def wakeupSearchResult():
+    _begin_date = request.args.get('begin_date')
+    _end_date   = request.args.get('end_date')
+    _id         = request.args.get('id')
+    _rank       = request.args.get('rank')
+    if _begin_date and _end_date:
+        if date_misc.check_double_date(_begin_date, _end_date):
+            _info = []
+            kargs = {}
+            try:
+                if _id != '':       kargs['user_id'] = int(_id)
+                if _rank != '':     kargs['rank'] = int(_rank)
+            except Exception, e:
+                flash(u'ID和排名不合法', 'error')
+                return redirect('/manage/wakeup_event/search')
+            _t = 1
+            for _date in date_misc.date_range(_begin_date, _end_date):
+                _kargs = kargs
+                _kargs['create_date'] = _date
+                wakeupRecInfoList = wakeupRec.query.order_by(wakeupRec.rank).filter_by(**kargs).all()
+                for _ in wakeupRecInfoList:
+                    _d = {}
+                    _d['id']          = str(_t)
+                    _d['create_date'] = _.create_date
+                    _d['create_time'] = _.create_time
+                    _d['rank']        = str(_.rank)
+                    _d['user_id']     = str(_.user_id)
+                    _info.append(_d)
+                    _t += 1
+            return render_template('manage_wakeup_search_result.html', info=_info)
+        else:
+            flash(u'日期不合法或者截至日期大于起始日期', 'error')
+            return redirect('/manage/wakeup_event/search')
+    else:
+        flash(u'请填写起始日期和截至日期', 'error')
+        return redirect('/manage/wakeup_event/search')
+
