@@ -190,3 +190,53 @@ def wakeupSummary():
         if _date == wakeupEventInfo.last_update_time:    _info['total'] = str(wakeupEventInfo.total)
         else:                                           _info['total'] = '0'
         return render_template('manage_wakeup_summary.html', info=_info)
+
+@app.route('/manage/wakeup_event/settings', methods=['GET', 'POST'])
+def wakeupSettings():
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+        if request.method == 'GET':
+            _info = {}
+            _info['switch']     = wakeupEventInfo.switch
+            _info['begin_time'] = wakeupEventInfo.begin_time
+            _info['end_time']   = wakeupEventInfo.end_time
+            _info['early_ret']  = wakeupEventInfo.early_ret
+            _info['late_ret']   = wakeupEventInfo.late_ret
+            _info['off_ret']    = wakeupEventInfo.off_ret
+            _info['acc_ret']    = wakeupEventInfo.acc_ret
+            _info['done_ret']   = wakeupEventInfo.done_ret
+            return render_template('manage_wakeup_settings.html', info=_info)
+        else:
+            switch     = int(str(request.form['switch']))
+            begin_time = request.form['begin_time']
+            end_time   = request.form['end_time']
+            early_ret  = request.form['early_ret']
+            late_ret   = request.form['late_ret']
+            off_ret    = request.form['off_ret']
+            acc_ret    = request.form['acc_ret']
+            done_ret   = request.form['done_ret']
+            if begin_time == '':
+                flash(u'请填写开始时间', 'error')
+                return redirect('/manage/wakeup_event/settings')
+            elif end_time == '':
+                flash(u'请填写结束时间', 'error')
+                return redirect('/manage/wakeup_event/settings')
+            else:
+                if time_misc.check_double_time(begin_time, end_time):
+                    wakeupEventInfo.switch     = switch
+                    wakeupEventInfo.begin_time = begin_time
+                    wakeupEventInfo.end_time   = end_time
+                    wakeupEventInfo.early_ret  = early_ret
+                    wakeupEventInfo.late_ret   = late_ret
+                    wakeupEventInfo.off_ret    = off_ret
+                    wakeupEventInfo.acc_ret    = acc_ret
+                    wakeupEventInfo.done_ret   = done_ret
+                    db.session.commit()
+                    flash(u'修改成功', 'success')
+                    return redirect('/manage/wakeup_event/summary')
+                else:
+                    flash(u'请设置合法时间或者结束时间大于开始时间', 'error')
+                    return redirect('/manage/wakeup_event/settings')
