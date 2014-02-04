@@ -111,7 +111,6 @@ def reflectReq():
                 db.session.add(userInfo)
                 db.session.commit()
             _date = time.strftime("%Y-%m-%d", time.localtime())
-            _date = '2014-2-3'
             _time = time.strftime('%H:%M',time.localtime())
             _time = '13:13'
             # Return transed off_ret if switch is off
@@ -155,6 +154,9 @@ def manageIndex():
 
 @app.route('/manage/login', methods=['GET', 'POST'])
 def manageLogin():
+    if 'username' in session:
+        flash(u'你需要登出后在登录', 'error')
+        return redirect('/manage')
     if request.method == 'GET':
         return render_template('manage_login.html')
     else:
@@ -173,3 +175,18 @@ def manageLogout():
     session.pop('username', None)
     flash(u'登出成功', 'success')
     return redirect('/manage')
+
+@app.route('/manage/wakeup_event/summary', methods=['GET'])
+def wakeupSummary():
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+        _date = time.strftime("%Y-%m-%d", time.localtime())
+        _info = {}
+        _info['switch'] = (lambda x: x and u'开启' or u'关闭')(wakeupEventInfo.switch)
+        _info['time_on'] = wakeupEventInfo.begin_time + ' - ' + wakeupEventInfo.end_time
+        if _date == wakeupEventInfo.last_update_time:    _info['total'] = str(wakeupEventInfo.total)
+        else:                                           _info['total'] = '0'
+        return render_template('manage_wakeup_summary.html', info=_info)
