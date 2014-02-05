@@ -6,7 +6,8 @@ from models.admin import admin
 from models.wakeupEvent import wakeupEvent
 from models.user import user
 from models.wakeupRec import wakeupRec
-import hashlib, time, time_misc, str_misc, date_misc
+from models.normalEvent import normalEvent
+import hashlib, time, time_misc, str_misc, date_misc, datetime
 
 @app.route('/', methods=['GET'])
 def getMainIndex():
@@ -242,43 +243,66 @@ def wakeupSettings():
 
 @app.route('/manage/wakeup_event/search', methods=['GET'])
 def wakeupSearch():
-    return render_template('manage_wakeup_search.html')
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        return render_template('manage_wakeup_search.html')
 
 @app.route('/manage/wakeup_event/search_result', methods=['GET'])
 def wakeupSearchResult():
-    _begin_date = request.args.get('begin_date')
-    _end_date   = request.args.get('end_date')
-    _id         = request.args.get('id')
-    _rank       = request.args.get('rank')
-    if _begin_date and _end_date:
-        if date_misc.check_double_date(_begin_date, _end_date):
-            _info = []
-            kargs = {}
-            try:
-                if _id != '':       kargs['user_id'] = int(_id)
-                if _rank != '':     kargs['rank'] = int(_rank)
-            except Exception, e:
-                flash(u'ID和排名不合法', 'error')
-                return redirect('/manage/wakeup_event/search')
-            _t = 1
-            for _date in date_misc.date_range(_begin_date, _end_date):
-                _kargs = kargs
-                _kargs['create_date'] = _date
-                wakeupRecInfoList = wakeupRec.query.order_by(wakeupRec.rank).filter_by(**kargs).all()
-                for _ in wakeupRecInfoList:
-                    _d = {}
-                    _d['id']          = str(_t)
-                    _d['create_date'] = _.create_date
-                    _d['create_time'] = _.create_time
-                    _d['rank']        = str(_.rank)
-                    _d['user_id']     = str(_.user_id)
-                    _info.append(_d)
-                    _t += 1
-            return render_template('manage_wakeup_search_result.html', info=_info)
-        else:
-            flash(u'日期不合法或者截至日期大于起始日期', 'error')
-            return redirect('/manage/wakeup_event/search')
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
     else:
-        flash(u'请填写起始日期和截至日期', 'error')
+        _begin_date = request.args.get('begin_date')
+        _end_date   = request.args.get('end_date')
+        _id         = request.args.get('id')
+        _rank       = request.args.get('rank')
+        if _begin_date and _end_date:
+            if date_misc.check_double_date(_begin_date, _end_date):
+                _info = []
+                kargs = {}
+                try:
+                    if _id != '':       kargs['user_id'] = int(_id)
+                    if _rank != '':     kargs['rank'] = int(_rank)
+                except Exception, e:
+                    flash(u'ID和排名不合法', 'error')
+                    return redirect('/manage/wakeup_event/search')
+                _t = 1
+                for _date in date_misc.date_range(_begin_date, _end_date):
+                    _kargs = kargs
+                    _kargs['create_date'] = _date
+                    wakeupRecInfoList = wakeupRec.query.order_by(wakeupRec.rank).filter_by(**kargs).all()
+                    for _ in wakeupRecInfoList:
+                        _d = {}
+                        _d['id']          = str(_t)
+                        _d['create_date'] = _.create_date
+                        _d['create_time'] = _.create_time
+                        _d['rank']        = str(_.rank)
+                        _d['user_id']     = str(_.user_id)
+                        _info.append(_d)
+                        _t += 1
+                return render_template('manage_wakeup_search_result.html', info=_info)
+            else:
+                flash(u'日期不合法或者截至日期大于起始日期', 'error')
+                return redirect('/manage/wakeup_event/search')
+        else:
+            flash(u'请填写起始日期和截至日期', 'error')
         return redirect('/manage/wakeup_event/search')
 
+@app.route('/manage/normal_event', methods=['GET'])
+def normalEventIndex():
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        _info = []
+        normalEventInfoList = normalEvent.query.all()
+        for e in normalEventInfoList:
+            _d = {}
+            _d['id']         = str(e.id)
+            _d['event_name'] = e.event_name
+            _d['time']       = e.begin_time.strftime('%Y-%m-%d %H:%M') + ' - ' + e.end_time.strftime('%Y-%m-%d %H:%M')
+            _info.append(_d)
+        return render_template('manage_normal_event_index.html', info=_info)

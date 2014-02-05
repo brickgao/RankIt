@@ -1,0 +1,33 @@
+{% extends "manage_base.html" %}
+{% block title %}概览 - 普通签到任务{% endblock %}
+{% block content %}
+<div class = "container">
+  <legend>概览 - 普通签到任务</legend>
+  <p>
+    <a class="btn btn-lg btn-primary" href="/manage/normal_event/new" role="button">创建新任务</a>
+  </p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>任务名称</th>
+        <th>任务时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    {% for e in info %}
+    <tr>
+      <th>{{ e['id'] }}</th>
+      <th>{{ e['event_name'] }}</th>
+      <th>{{ e['time'] }}</th>
+      <th>
+        <a class="btn btn-primary" href="/manage/normal_event/{{ e['id'] }}" role="button">查看</a> 
+        <a class="btn btn-primary" href="/manage/normal_event/{{ e['id'] }}/edit" role="button">编辑</a> 
+        <a class="btn btn-danger" href="/manage/normal_event/{{ e['id'] }}/clear_data" role="button">清空数据</a> 
+        <a class="btn btn-danger" href="/manage/normal_event/{{ e['id'] }}/delete" role="button">删除</a>
+      </th>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
