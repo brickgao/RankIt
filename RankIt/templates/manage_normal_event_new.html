@@ -1,0 +1,70 @@
+{% extends "manage_base.html" %}
+
+{% block title %}新建 - 普通签到任务{% endblock %}
+{% block content %}
+<div class = "container">
+  <form class="form-horizontal" method="post">
+    <legend>新建一个普通签到任务</legend>
+    <div class="form-group">
+      <label for="event_name" class="col-sm-2 control-label">任务名称</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" style="width:70%;" id="event_name" name="event_name" placeholder="任务名称">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="begin_time" class="col-sm-2 control-label">开始时间</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" style="width:70%;" id="begin_time" name="begin_time" placeholder="开始时间">
+        <p class="help-block">格式为 yyyy-mm-dd hh:mm</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="end_time" class="col-sm-2 control-label">结束时间</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" style="width:70%;" id="end_time" name="end_time" placeholder="结束时间">
+        <p class="help-block">格式为 yyyy-mm-dd hh:mm</p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="early_ret" class="col-sm-2 control-label">提早回复</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" rows="3" style="width:70%;" id="early_ret" name="early_ret"></textarea>
+        <p class="help-block">如果用户未签到，且请求签到时间早于开始时间，则返回此回复，我们定义：$[time_now]表示当前时间<hh:mm></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="late_ret" class="col-sm-2 control-label">迟到回复</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" rows="3" style="width:70%;" id="late_ret" name="late_ret"></textarea>
+        <p class="help-block">如果用户未签到，且请求签到时间迟于开始时间，则返回此回复，我们定义：$[time_now]表示当前时间<hh:mm></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="acc_defualt_ret" class="col-sm-2 control-label">默认回复</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" rows="3" style="width:70%;" id="acc_defualt_ret" name="acc_defualt_ret"></textarea>
+        <p class="help-block">如果正常签到且无规则匹配，则返回此回复，我们定义：$[rank]表示当前排名；$[time_now]表示当前时间<hh:mm>；$[time_req]表示上一次成功签到时间<hh:mm></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="done_ret" class="col-sm-2 control-label">已签回复</label>
+      <div class="col-sm-10">
+        <textarea class="form-control" rows="3" style="width:70%;" id="done_ret" name="done_ret"></textarea>
+        <p class="help-block">如果用户已经签到，则返回此回复，我们定义：$[rank]表示当前排名；$[time_now]表示当前时间<hh:mm>；$[time_req]表示上一次成功签到时间<hh:mm></p>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-10">
+        <button type="submit" class="btn btn-primary">创建</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block jsextends %}
+<script type="text/javascript">
+    $('#begin_time').datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+    $('#end_time').datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+</script>
+{% endblock %}
+

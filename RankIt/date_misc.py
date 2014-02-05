@@ -30,3 +30,17 @@ def date_range(s1, s2):
         if _date1 >= _date2:
             break
     return _ret
+
+def date_trans(s):
+    _r = re.compile('^\d\d\d\d-\d\d-\d\d \d\d:\d\d$')
+    if not _r.match(s):
+        return None
+    else:
+        _date ,_time = s.split(' ')[0], s.split(' ')[1]
+        _date = _date.split('-')
+        _time = _time.split(':')
+        try:
+            _datetime = datetime.datetime(int(_date[0]), int(_date[1]), int(_date[2]), int(_time[0]), int(_time[1]))
+        except Exception, e:
+            return None
+        return _datetime

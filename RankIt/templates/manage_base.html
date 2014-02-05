@@ -15,6 +15,7 @@
                                       
     <!-- Custom styles for this template -->
     <link href="{{url_for('static', filename='css/manage_base.css')}}" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/bootstrap-datetimepicker.min.css')}}" rel="stylesheet">
 
   </head>
 
@@ -92,6 +93,8 @@
     </div>
     <script src="{{url_for('static', filename='js/jquery-2.1.0.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap-datetimepicker.min.js')}}"></script>
+    {% block jsextends %}{% endblock jsextends %} 
   </body>
 </html>
 

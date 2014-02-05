@@ -306,3 +306,55 @@ def normalEventIndex():
             _d['time']       = e.begin_time.strftime('%Y-%m-%d %H:%M') + ' - ' + e.end_time.strftime('%Y-%m-%d %H:%M')
             _info.append(_d)
         return render_template('manage_normal_event_index.html', info=_info)
+
+@app.route('/manage/normal_event/new', methods=['GET', 'POST'])
+def normalEventNew():
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        if request.method == 'GET':
+            return render_template('manage_normal_event_new.html')
+        else:
+            event_name          = request.form['event_name']
+            begin_time          = request.form['begin_time']
+            end_time            = request.form['end_time']
+            early_ret           = request.form['early_ret']
+            late_ret            = request.form['late_ret']
+            acc_defualt_ret     = request.form['acc_defualt_ret']
+            done_ret            = request.form['done_ret']
+            if event_name == '':
+                flash(u'请填写时间名称', 'error')
+                return redirect('/manage/normal_event/new')
+            if begin_time == '':
+                flash(u'请填写开始时间', 'error')
+                return redirect('/manage/normal_event/new')
+            if end_time == '':
+                flash(u'请填写结束时间', 'error')
+                return redirect('/manage/normal_event/new')
+            _begin_time = date_misc.date_trans(begin_time)
+            _end_time   = date_misc.date_trans(end_time)
+            if not _begin_time:
+                flash(u'开始时间不合法', 'error')
+                return redirect('/manage/normal_event/new')
+            if not _end_time:
+                flash(u'结束时间不合法', 'error')
+                return redirect('/manage/normal_event/new')
+            if _begin_time > _end_time:
+                flash(u'开始时间大于结束时间', 'error')
+                return redirect('/manage/normal_event/new')
+            _l = []
+            normalEventInfoList = normalEvent.query.all()
+            for e in normalEventInfoList:
+                _l.append(e.id)
+            _l.sort()
+            _id = 1
+            while True:
+                if _id not in _l:
+                    break
+                _id += 1
+            normalEventInfo = normalEvent(_id, event_name, _begin_time, _end_time, early_ret, late_ret, acc_defualt_ret, done_ret)
+            db.session.add(normalEventInfo)
+            db.session.commit()
+            flash(u'新建事件成功', 'success')
+            return redirect('/manage/normal_event')
