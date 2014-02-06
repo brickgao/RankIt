@@ -4,6 +4,9 @@
 <div class="container">
   <form class="form-horizontal" method="post">
     <legend>清空数据 - {{ event_name }}</legend>
+    <div class="alert alert-danger">
+      <p>您正在执行的是一项不可逆转的危险操作，请务必确认这个操作的正确性。</p>
+    </div>
     <div class="form-group">
       <label for="confirm" class="col-sm-2 control-label">确认操作</label>
         <div class="col-sm-10">
