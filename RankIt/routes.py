@@ -7,6 +7,7 @@ from models.wakeupEvent import wakeupEvent
 from models.user import user
 from models.wakeupRec import wakeupRec
 from models.normalEvent import normalEvent
+from models.normalRec import normalRec
 import hashlib, time, time_misc, str_misc, date_misc, datetime
 
 @app.route('/', methods=['GET'])
@@ -358,3 +359,58 @@ def normalEventNew():
             db.session.commit()
             flash(u'新建事件成功', 'success')
             return redirect('/manage/normal_event')
+
+@app.route('/manage/normal_event/<int:_id>/clear_data', methods=['GET', 'POST'])
+def normalEventClearData(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            if request.method == 'GET':
+                _event_name = normalEventInfo.event_name
+                return render_template('manage_normal_event_clear_data.html', event_name=_event_name)
+            else:
+                _confirm = request.form['confirm']
+                if _confirm == 'clear data':
+                    normalRecInfoList = normalRec.query.filter_by(event_id=_id).all()
+                    for e in normalRecInfoList:
+                        db.session.delete(e)
+                    db.session.commit()
+                    flash(u'清空数据成功', 'success')
+                    return redirect('/manage/normal_event')
+                else:
+                    flash(u'确认字符不正确', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/clear_data')
+
+@app.route('/manage/normal_event/<int:_id>/delete', methods=['GET', 'POST'])
+def normalEventDelete(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            if request.method == 'GET':
+                _event_name = normalEventInfo.event_name
+                return render_template('manage_normal_event_delete.html', event_name=_event_name)
+            else:
+                _confirm = request.form['confirm']
+                if _confirm == 'delete':
+                    normalRecInfoList = normalRec.query.filter_by(event_id=_id).all()
+                    for e in normalRecInfoList:
+                        db.session.delete(e)
+                    db.session.delete(normalEventInfo)
+                    db.session.commit()
+                    flash(u'删除成功', 'success')
+                    return redirect('/manage/normal_event')
+                else:
+                    flash(u'确认字符不正确', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/delete')
+
+                    
