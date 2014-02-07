@@ -7,4 +7,5 @@ def trans_str(_s, time_now, time_req=None, rank=None):
         ret = ret.replace('$[time_req]', time_req)
     if rank:
         ret = ret.replace('$[rank]', rank)
+        ret = ret.replace('$[defeat]', str(12460 - int(rank)))
     return ret
