@@ -8,6 +8,7 @@ from models.user import user
 from models.wakeupRec import wakeupRec
 from models.normalEvent import normalEvent
 from models.normalRec import normalRec
+from models.normalEventRules import normalEventRules
 import hashlib, time, time_misc, str_misc, date_misc, datetime
 
 @app.route('/', methods=['GET'])
@@ -499,3 +500,38 @@ def normalEventEdit(_id):
                 db.session.commit()
                 flash(u'修改事件成功', 'success')
                 return redirect('/manage/normal_event')
+
+@app.route('/manage/normal_event/<int:_id>/rules', methods=['GET'])
+def normalEventRulesIndex(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            _info = {}
+            _info['event_id']   = str(_id)
+            _info['event_name'] = normalEventInfo.event_name
+            _list = []
+            normalEventRulesInfoList = normalEventRules.query.filter_by(event_id=_id).all()
+            for e in normalEventRulesInfoList:
+                _d = {}
+                _d['id']         = e.id
+                if rule_type == 'range':
+                    _id['range'] = str(e.range_begin) + ' - ' + str(e.range_end)
+                _list.append(_d)
+            _info['rules_list'] = _list
+            return render_template('manage_normal_event_rules_index.html', info=_info)
+
+@app.route('/manage/normal_event/<int:_id>/rules/new', methods=['GET', 'POST'])
+def normalEventRulesIndex(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:

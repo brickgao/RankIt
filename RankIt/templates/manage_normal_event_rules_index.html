@@ -1,0 +1,29 @@
+{% extends "manage_base.html" %}
+{% block title %}规则 - {{ info['event_name'] }}{% endblock %}
+{% block content %}
+<div class = "container">
+  <legend>规则 - {{ info['event_name'] }}</legend>
+  <p>
+    <a class="btn btn-lg btn-primary" href="/manage/normal_event/{{ info['event_id'] }}/rules/new" role="button">创建新规则</a>
+  </p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>匹配范围</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    {% for e in info['rules_list'] %}
+    <tr>
+      <th>{{ e['id'] }}</th>
+      <th>{{ e['range'] }}</th>
+      <th>
+        <a class="btn btn-primary" href="/manage/normal_event/{{ info['event_id'] }}/rules/{{ e['id'] }}/edit" role="button">编辑</a> 
+        <a class="btn btn-danger" href="/manage/normal_event/{{ info['event_id'] }}/rules/{{ e['id'] }}/delete" role="button">删除</a>
+      </th>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
