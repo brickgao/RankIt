@@ -6,6 +6,7 @@
   <p>事件ID: {{ info['id'] }}</p>
   <p>时间: {{ info['time'] }}</p>
   <p>总签到人数: {{ info['total'] }}</p>
+  <p>签到列表: </p>
   <table class="table">
     <thead>
       <tr>
@@ -17,7 +18,7 @@
     {% for e in info['user_list'] %}
     <tr>
       <th>{{ e['rank'] }}</th>
-      <th>{{ e['id'] }}</th>
+      <th>{{ e['user_id'] }}</th>
       <th>{{ e['create_time'] }}</th>
     </tr>
     {% endfor %}

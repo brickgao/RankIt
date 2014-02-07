@@ -147,7 +147,48 @@ def reflectReq():
                 _ret = str_misc.trans_str(wakeupEventInfo.done_ret, _time, wakeupRecInfo.create_time, str(wakeupRecInfo.rank))
                 return _ret
         if _event == 'normal':
-            return 'normal event'
+            try:
+                event_id = int(request.args.get('event_id'))
+            except Exception, e:
+                return abort(404)
+            try:
+                _id = int(request.args.get('id'))
+            except Exception, e:
+                return abort(404)
+            normalEventInfo = normalEvent.query.filter_by(id=event_id).first()
+            userInfo = user.query.filter_by(id=_id).first()
+            if not userInfo:
+                userInfo = user(_id, '')
+                db.session.add(userInfo)
+                db.session.commit()
+            if not normalEventInfo:
+                return abort(404)
+            _time = time.strftime('%H:%M',time.localtime())
+            normalRecInfo = normalRec.query.filter_by(user_id=_id, event_id=event_id).first()
+            if normalRecInfo:
+                _ret = str_misc.trans_str(normalEventInfo.done_ret, _time,
+                                          normalRecInfo.create_time.strftime('%H:%M'),
+                                          str(normalRecInfo.rank))
+                return _ret
+            now_datetime = datetime.datetime.now()
+            if now_datetime < normalEventInfo.begin_time:
+                _ret = str_misc.trans_str(normalEventInfo.early_ret, _time)
+                return _ret
+            if now_datetime > normalEventInfo.end_time:
+                _ret = str_misc.trans_str(normalEventInfo.early_ret, _time)
+                return _ret
+            normalEventInfo.total += 1
+            _rank = normalEventInfo.total
+            normalEventRulesInfoList = normalEventRules.query.order_by(normalEventRules.id).all()
+            normalRecInfo = normalRec(_id, event_id, _rank, now_datetime)
+            db.session.add(normalRecInfo)
+            db.session.commit()
+            for e in normalEventRulesInfoList:
+                if _rank >= e.range_begin and _rank < e.range_end:
+                    _ret = str_misc.trans_str(e.ret, _time, _time, str(_rank))
+                    return _ret
+            _ret = str_misc.trans_str(normalEventInfo.acc_defualt_ret, _time, _time, str(_rank))
+            return _ret
     return abort(404)
 
 @app.route('/manage', methods=['GET'])
@@ -191,6 +232,15 @@ def wakeupSummary():
         _info['time_on'] = wakeupEventInfo.begin_time + ' - ' + wakeupEventInfo.end_time
         if _date == wakeupEventInfo.last_update_time:    _info['total'] = str(wakeupEventInfo.total)
         else:                                           _info['total'] = '0'
+        wakeupRecInfoList = wakeupRec.query.order_by(wakeupRec.rank).filter_by(create_date=_date).all()
+        _list = []
+        for e in wakeupRecInfoList:
+            _d = {}
+            _d['rank']        = e.rank
+            _d['user_id']     = e.user_id
+            _d['create_time'] = e.create_time
+            _list.append(_d)
+        _info['user_list'] = _list
         return render_template('manage_wakeup_summary.html', info=_info)
 
 @app.route('/manage/wakeup_event/settings', methods=['GET', 'POST'])
@@ -615,3 +665,33 @@ def normalEventRulesEdit(_id, r_id):
                     db.session.commit()
                     flash(u'规则修改成功', 'success')
                     return redirect('/manage/normal_event/' + str(_id) + '/rules')
+
+@app.route('/manage/normal_event/<int:_id>/rules/<int:r_id>/delete', methods=['GET', 'POST'])
+def normalEventRulesDelete(_id, r_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            normalEventRulesInfo = normalEventRules.query.filter_by(event_id=_id, id=r_id).first()
+            if not normalEventRulesInfo:
+                return abort(404)
+            else:
+                if request.method == 'GET':
+                    _event_name = normalEventInfo.event_name
+                    _r_id       = str(normalEventRulesInfo.id)
+                    return render_template('manage_normal_event_rules_delete.html', event_name=_event_name, r_id=_r_id)
+                else:
+                    _confirm = request.form['confirm']
+                    if _confirm == 'delete':
+                        db.session.delete(normalEventRulesInfo)
+                        db.session.commit()
+                        flash(u'删除成功', 'success')
+                        return redirect('/manage/normal_event/' + str(_id) + '/rules')
+                    else:
+                        flash(u'确认字符不正确', 'error')
+                        return redirect('/manage/normal_event/' + str(_id) + '/rules/' + str(r_id) + '/delete')
+
