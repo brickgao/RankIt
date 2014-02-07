@@ -407,6 +407,9 @@ def normalEventDelete(_id):
                     normalRecInfoList = normalRec.query.filter_by(event_id=_id).all()
                     for e in normalRecInfoList:
                         db.session.delete(e)
+                    normalEventRulesInfoList = normalEventRules.query.filter_by(event_id=_id).all()
+                    for e in normalEventRulesInfoList:
+                        db.session.delete(e)
                     db.session.delete(normalEventInfo)
                     db.session.commit()
                     flash(u'删除成功', 'success')
@@ -515,18 +518,18 @@ def normalEventRulesIndex(_id):
             _info['event_id']   = str(_id)
             _info['event_name'] = normalEventInfo.event_name
             _list = []
-            normalEventRulesInfoList = normalEventRules.query.filter_by(event_id=_id).all()
+            normalEventRulesInfoList = normalEventRules.query.order_by(normalEventRules.id).filter_by(event_id=_id).all()
             for e in normalEventRulesInfoList:
                 _d = {}
                 _d['id']         = e.id
-                if rule_type == 'range':
-                    _id['range'] = str(e.range_begin) + ' - ' + str(e.range_end)
+                if not e.rule_type:
+                    _d['range'] = str(e.range_begin) + ' - ' + str(e.range_end)
                 _list.append(_d)
             _info['rules_list'] = _list
             return render_template('manage_normal_event_rules_index.html', info=_info)
 
 @app.route('/manage/normal_event/<int:_id>/rules/new', methods=['GET', 'POST'])
-def normalEventRulesIndex(_id):
+def normalEventRulesNew(_id):
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -535,3 +538,80 @@ def normalEventRulesIndex(_id):
         if not normalEventInfo:
             return abort(404)
         else:
+            if request.method == 'GET':
+                _info = normalEventInfo.event_name
+                return render_template('manage_normal_event_rules_new.html', info=_info)
+            else:
+                try:
+                    range_begin = int(request.form['range_begin'])
+                except Exception, e:
+                    flash(u'开始范围不合法', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                try:
+                    range_end = int(request.form['range_end'])
+                except Exception, e:
+                    flash(u'结束范围不合法', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                ret = request.form['ret']
+                if range_begin >= range_end:
+                    flash(u'开始范围大于等于结束范围', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                normalEventRulesInfoList = normalEventRules.query.all()
+                _l = []
+                for e in normalEventRulesInfoList:
+                    _l.append(e.id)
+                _l.sort()
+                r_id = 1
+                while True:
+                    if r_id not in _l:
+                        break
+                    r_id += 1
+                normalEventRulesInfo = normalEventRules(r_id, _id, 0, '', range_begin, range_end, ret)
+                db.session.add(normalEventRulesInfo)
+                db.session.commit()
+                flash(u'规则添加成功', 'success')
+                return redirect('/manage/normal_event/' + str(_id) + '/rules')
+
+@app.route('/manage/normal_event/<int:_id>/rules/<int:r_id>/edit', methods=['GET', 'POST'])
+def normalEventRulesEdit(_id, r_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            normalEventRulesInfo = normalEventRules.query.filter_by(event_id=_id, id=r_id).first()
+            if not normalEventRulesInfo:
+                return abort(404)
+            else:
+                if request.method == 'GET':
+                    _info = {}
+                    _info['event_name']  = normalEventInfo.event_name
+                    _info['id']          = normalEventRulesInfo.id
+                    _info['range_begin'] = normalEventRulesInfo.range_begin
+                    _info['range_end']   = normalEventRulesInfo.range_end
+                    _info['ret']         = normalEventRulesInfo.ret
+                    return render_template('manage_normal_event_rules_edit.html', info=_info)
+                else:
+                    try:
+                        range_begin = int(request.form['range_begin'])
+                    except Exception, e:
+                        flash(u'开始范围不合法', 'error')
+                        return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                    try:
+                        range_end = int(request.form['range_end'])
+                    except Exception, e:
+                        flash(u'结束范围不合法', 'error')
+                        return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                    ret = request.form['ret']
+                    if range_begin >= range_end:
+                        flash(u'开始范围大于等于结束范围', 'error')
+                        return redirect('/manage/normal_event/' + str(_id) + '/rules/new')
+                    normalEventRulesInfo.range_begin = range_begin
+                    normalEventRulesInfo.range_end   = range_end
+                    normalEventRulesInfo.ret         = ret
+                    db.session.commit()
+                    flash(u'规则修改成功', 'success')
+                    return redirect('/manage/normal_event/' + str(_id) + '/rules')

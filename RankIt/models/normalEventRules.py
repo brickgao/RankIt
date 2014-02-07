@@ -6,7 +6,8 @@ import hashlib
 class normalEventRules(db.Model):
 
     __tablename__ = 'normal_event_rules'
-    id            = db.Column(db.Integer, primary_key=True)
+    _id           = db.Column(db.String(250), primary_key=True)
+    id            = db.Column(db.Integer, unique=False)
     event_id      = db.Column(db.Integer, db.ForeignKey('normal_event.id'))
     normal_event  = db.relationship('normalEvent',
                                     primaryjoin='normalEventRules.event_id == normalEvent.id',
@@ -20,6 +21,7 @@ class normalEventRules(db.Model):
 
     def __init__(self, id, event_id, rule_type, reg, range_begin, range_end, ret):
 
+        self._id         = hashlib.sha512(str(event_id) + 'and' + str(id)).hexdigest()
         self.id          = id
         self.event_id    = event_id
         self.rule_type   = rule_type
