@@ -193,10 +193,18 @@ def reflectReq():
 
 @app.route('/manage', methods=['GET'])
 def manageIndex():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     return render_template('manage_index.html')
 
 @app.route('/manage/login', methods=['GET', 'POST'])
 def manageLogin():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if 'username' in session:
         flash(u'你需要登出后在登录', 'error')
         return redirect('/manage')
@@ -215,12 +223,20 @@ def manageLogin():
 
 @app.route('/manage/logout')
 def manageLogout():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     session.pop('username', None)
     flash(u'登出成功', 'success')
     return redirect('/manage')
 
 @app.route('/manage/wakeup_event/summary', methods=['GET'])
 def wakeupSummary():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -245,6 +261,10 @@ def wakeupSummary():
 
 @app.route('/manage/wakeup_event/settings', methods=['GET', 'POST'])
 def wakeupSettings():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -295,6 +315,10 @@ def wakeupSettings():
 
 @app.route('/manage/wakeup_event/search', methods=['GET'])
 def wakeupSearch():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -303,6 +327,10 @@ def wakeupSearch():
 
 @app.route('/manage/wakeup_event/search_result', methods=['GET'])
 def wakeupSearchResult():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -345,6 +373,10 @@ def wakeupSearchResult():
 
 @app.route('/manage/normal_event', methods=['GET'])
 def normalEventIndex():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -361,6 +393,10 @@ def normalEventIndex():
 
 @app.route('/manage/normal_event/new', methods=['GET', 'POST'])
 def normalEventNew():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -413,6 +449,10 @@ def normalEventNew():
 
 @app.route('/manage/normal_event/<int:_id>/clear_data', methods=['GET', 'POST'])
 def normalEventClearData(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -440,6 +480,10 @@ def normalEventClearData(_id):
 
 @app.route('/manage/normal_event/<int:_id>/delete', methods=['GET', 'POST'])
 def normalEventDelete(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -470,6 +514,10 @@ def normalEventDelete(_id):
 
 @app.route('/manage/normal_event/<int:_id>', methods=['GET'])
 def normalEventView(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -497,6 +545,10 @@ def normalEventView(_id):
 
 @app.route('/manage/normal_event/<int:_id>/edit', methods=['GET', 'POST'])
 def normalEventEdit(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -556,6 +608,10 @@ def normalEventEdit(_id):
 
 @app.route('/manage/normal_event/<int:_id>/rules', methods=['GET'])
 def normalEventRulesIndex(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -580,6 +636,10 @@ def normalEventRulesIndex(_id):
 
 @app.route('/manage/normal_event/<int:_id>/rules/new', methods=['GET', 'POST'])
 def normalEventRulesNew(_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -624,6 +684,10 @@ def normalEventRulesNew(_id):
 
 @app.route('/manage/normal_event/<int:_id>/rules/<int:r_id>/edit', methods=['GET', 'POST'])
 def normalEventRulesEdit(_id, r_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
@@ -668,6 +732,10 @@ def normalEventRulesEdit(_id, r_id):
 
 @app.route('/manage/normal_event/<int:_id>/rules/<int:r_id>/delete', methods=['GET', 'POST'])
 def normalEventRulesDelete(_id, r_id):
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        return redirect('/init')
     if not 'username' in session:
         flash(u'请先登录', 'error')
         return redirect('/manage/login')
