@@ -7,6 +7,7 @@ class normalEvent(db.Model):
     __tablename__   = 'normal_event'
     id              = db.Column(db.Integer, primary_key=True)
     event_name      = db.Column(db.String(250), unique=False)
+    total           = db.Column(db.Integer, unique=False)
     early_ret       = db.Column(db.Text, unique=False)
     late_ret        = db.Column(db.Text, unique=False)
     acc_defualt_ret = db.Column(db.Text, unique=False)
@@ -21,6 +22,7 @@ class normalEvent(db.Model):
         self.event_name      = event_name
         self.begin_time      = begin_time
         self.end_time        = end_time
+        self.total           = 0
         self.early_ret       = early_ret
         self.late_ret        = late_ret
         self.acc_defualt_ret = acc_defualt_ret

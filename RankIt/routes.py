@@ -379,6 +379,7 @@ def normalEventClearData(_id):
                     normalRecInfoList = normalRec.query.filter_by(event_id=_id).all()
                     for e in normalRecInfoList:
                         db.session.delete(e)
+                    normalEventInfo.total = 0
                     db.session.commit()
                     flash(u'清空数据成功', 'success')
                     return redirect('/manage/normal_event')
@@ -413,4 +414,88 @@ def normalEventDelete(_id):
                     flash(u'确认字符不正确', 'error')
                     return redirect('/manage/normal_event/' + str(_id) + '/delete')
 
-                    
+@app.route('/manage/normal_event/<int:_id>', methods=['GET'])
+def normalEventView(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            normalRecInfoList = normalRec.query.order_by(normalRec.rank).filter_by(event_id=_id).all()
+            _info = {}
+            _info['event_name'] = normalEventInfo.event_name
+            _info['id']         = str(_id)
+            _info['total']      = normalEventInfo.total
+            _info['time']       = normalEventInfo.begin_time.strftime('%Y-%m-%d %H:%M') + ' - ' + \
+                                  normalEventInfo.end_time.strftime('%Y-%m-%d %H:%M')
+            _list = []
+            for e in normalRecInfoList:
+                _d = {}
+                _d['rank']      = str(e.rank)
+                _d['user_id']   = str(e.user_id)
+                _d['create_time'] = e.create_time.strftime('%Y-%m-%d %H:%M')
+                _list.append(_d)
+            _info['user_list'] = _list
+            return render_template('manage_normal_event_view.html', info=_info)
+
+@app.route('/manage/normal_event/<int:_id>/edit', methods=['GET', 'POST'])
+def normalEventEdit(_id):
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        return redirect('/manage/login')
+    else:
+        normalEventInfo = normalEvent.query.filter_by(id=_id).first()
+        if not normalEventInfo:
+            return abort(404)
+        else:
+            if request.method == 'GET':
+                _info = {}
+                _info['event_name']      = normalEventInfo.event_name
+                _info['early_ret']       = normalEventInfo.early_ret
+                _info['late_ret']        = normalEventInfo.late_ret
+                _info['acc_defualt_ret'] = normalEventInfo.acc_defualt_ret
+                _info['done_ret']        = normalEventInfo.done_ret
+                _info['begin_time']      = normalEventInfo.begin_time.strftime('%Y-%m-%d %H:%M')
+                _info['end_time']        = normalEventInfo.end_time.strftime('%Y-%m-%d %H:%M')
+                return render_template('manage_normal_event_edit.html', info=_info)
+            else:
+                event_name          = request.form['event_name']
+                begin_time          = request.form['begin_time']
+                end_time            = request.form['end_time']
+                early_ret           = request.form['early_ret']
+                late_ret            = request.form['late_ret']
+                acc_defualt_ret     = request.form['acc_defualt_ret']
+                done_ret            = request.form['done_ret']
+                if event_name == '':
+                    flash(u'请填写时间名称', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                if begin_time == '':
+                    flash(u'请填写开始时间', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                if end_time == '':
+                    flash(u'请填写结束时间', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                _begin_time = date_misc.date_trans(begin_time)
+                _end_time   = date_misc.date_trans(end_time)
+                if not _begin_time:
+                    flash(u'开始时间不合法', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                if not _end_time:
+                    flash(u'结束时间不合法', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                if _begin_time > _end_time:
+                    flash(u'开始时间大于结束时间', 'error')
+                    return redirect('/manage/normal_event/' + str(_id) + '/edit')
+                normalEventInfo.event_name      = event_name
+                normalEventInfo.early_ret       = early_ret
+                normalEventInfo.late_ret        = late_ret
+                normalEventInfo.acc_defualt_ret = acc_defualt_ret
+                normalEventInfo.done_ret        = done_ret
+                normalEventInfo.begin_time      = _begin_time
+                normalEventInfo.end_time        = _end_time
+                db.session.commit()
+                flash(u'修改事件成功', 'success')
+                return redirect('/manage/normal_event')

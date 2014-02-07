@@ -1,0 +1,26 @@
+{% extends "manage_base.html" %}
+{% block title %}查看 - {{ info['event_name'] }}{% endblock %}
+{% block content %}
+<div class = "container">
+  <legend>查看 - {{ info['event_name'] }}</legend>
+  <p>事件ID: {{ info['id'] }}</p>
+  <p>时间: {{ info['time'] }}</p>
+  <p>总签到人数: {{ info['total'] }}</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>用户ID</th>
+        <th>签到时间</th>
+      </tr>
+    </thead>
+    {% for e in info['user_list'] %}
+    <tr>
+      <th>{{ e['rank'] }}</th>
+      <th>{{ e['id'] }}</th>
+      <th>{{ e['create_time'] }}</th>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
