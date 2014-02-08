@@ -4,7 +4,7 @@ import sys
 app_root = os.path.dirname(__file__)
 
 sys.path.insert(0, os.path.join(app_root, 'virtualenv.bundle.zip'))
-import sys
+import sae
 
 from RankIt.routes import app
 
