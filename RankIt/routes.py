@@ -262,6 +262,46 @@ def manageLogin():
             db.session.close()
             return redirect('/manage/login')
 
+@app.route('/manage/changepasswd', methods=['GET', 'POST'])
+def manageChangePasswd():
+    adminInfo = admin.query.filter_by(username='admin').first()
+    wakeupEventInfo = wakeupEvent.query.filter_by(id=1).first()
+    if not adminInfo or not wakeupEventInfo:
+        db.session.close()
+        return redirect('/init')
+    if not 'username' in session:
+        flash(u'请先登录', 'error')
+        db.session.close()
+        return redirect('/manage/login')
+    if request.method == 'GET':
+        db.session.close()
+        return render_template('manage_change_passwd.html')
+    else:
+        adminInfo = admin.query.filter_by(username='admin').first()
+        _passwd = hashlib.sha512('biu' + request.form['oldpasswd']).hexdigest()
+        if _passwd == adminInfo.passwd:
+            if request.form['newpasswd'] == '':
+                flash(u'请填写新密码', 'error')
+                db.session.close()
+                return redirect('/manage/changepasswd')
+            elif request.form['newpasswd'] == request.form['passwdagain']:
+                _passwd = hashlib.sha512('biu' + request.form['newpasswd']).hexdigest()
+                adminInfo.passwd = _passwd
+                db.session.commit()
+                db.session.close()
+                flash(u'修改密码成功，请重新登录', 'success')
+                session.pop('username', None)
+                return redirect('/manage/login')
+            else:
+                flash(u'新密码和确认密码不一致', 'error')
+                db.session.close()
+                return redirect('/manage/changepasswd')
+        else:
+            flash(u'旧密码错误', 'error')
+            db.session.close()
+            return redirect('/manage/changepasswd')
+
+
 @app.route('/manage/logout')
 def manageLogout():
     adminInfo = admin.query.filter_by(username='admin').first()
