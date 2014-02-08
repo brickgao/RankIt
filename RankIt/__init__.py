@@ -3,11 +3,19 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from RankIt import *
+from sae.const import (MYSQL_HOST, MYSQL_HOST_S,
+    MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
+)
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost/RankIt'
+app.debug = True
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://' + MYSQL_USER + ':' + MYSQL_PASS + '@' + MYSQL_HOST + ':' + str(MYSQL_PORT) + '/' + MYSQL_DB
 app.config['SECRET_KEY'] = 'biubiubiuhaoyu'
+app.config['SQLALCHEMY_POOL_SIZE'] = 1
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 720
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 5
 
 db = SQLAlchemy(app)
 
