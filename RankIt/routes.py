@@ -153,15 +153,15 @@ def reflectReq():
                     db.session.close()
                     return _ret
                 # Return acc_ret if all thing is right
-                if wakeupEventInfo.last_update_time == _date:
-                    _rank = wakeupEventInfo.total + 1
-                    wakeupEventInfo.total = _rank
-                else:
-                    _rank = 1
-                    wakeupEventInfo.last_update_time = _date
-                    wakeupEventInfo.total = _rank
-                wakeupRecInfo = wakeupRec(_id, _rank, _date, _time)
+                db.engine.execute('UPDATE wakeup_event SET last_total = total, last_update_time = %s WHERE last_update_time != %s',
+                                  (_date, _date))
+                db.engine.execute('UPDATE wakeup_event SET total = total + 1')
+                wakeupRecInfo = wakeupRec(_id, _date, _time)
                 db.session.add(wakeupRecInfo)
+                db.session.commit()
+                wakeupRecInfo = wakeupRec.query.filter_by(user_id=_id, create_date=_date).first()
+                _rank = wakeupRecInfo._id - wakeupEvent.query.filter_by(id=1).first().last_total
+                wakeupRecInfo.rank = _rank
                 db.session.commit()
                 _ret = str_misc.trans_str(wakeupEventInfo.acc_ret, _time, _time, str(_rank))
                 db.session.close()
@@ -209,10 +209,18 @@ def reflectReq():
                 db.session.close()
                 return _ret
             normalEventInfo.total += 1
-            _rank = normalEventInfo.total
             normalEventRulesInfoList = normalEventRules.query.order_by(normalEventRules.id).all()
-            normalRecInfo = normalRec(_id, event_id, _rank, now_datetime)
+            normalRecInfo = normalRec(_id, event_id, now_datetime)
             db.session.add(normalRecInfo)
+            db.session.commit()
+            normalRecInfo = normalRec.query.filter_by(user_id=_id, event_id=event_id).first()
+            normalRecInfoList = normalRec.query.order_by(normalRec.id).filter_by(event_id=event_id).all()
+            _rank = 0
+            for e in normalRecInfoList:
+                _rank += 1
+                if e.user_id == _id:
+                    break
+            normalRecInfo.rank = _rank
             db.session.commit()
             for e in normalEventRulesInfoList:
                 if _rank >= e.range_begin and _rank < e.range_end:
@@ -331,8 +339,8 @@ def wakeupSummary():
         _info = {}
         _info['switch'] = (lambda x: x and u'开启' or u'关闭')(wakeupEventInfo.switch)
         _info['time_on'] = wakeupEventInfo.begin_time + ' - ' + wakeupEventInfo.end_time
-        if _date == wakeupEventInfo.last_update_time:    _info['total'] = str(wakeupEventInfo.total)
-        else:                                           _info['total'] = '0'
+        if _date == wakeupEventInfo.last_update_time:    _info['total'] = str(wakeupEventInfo.total - wakeupEventInfo.last_total)
+        else:                                            _info['total'] = '0'
         wakeupRecInfoList = wakeupRec.query.order_by(wakeupRec.rank).filter_by(create_date=_date).all()
         _list = []
         for e in wakeupRecInfoList:
