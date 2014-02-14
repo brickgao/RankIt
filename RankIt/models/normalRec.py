@@ -19,11 +19,10 @@ class normalRec(db.Model):
                                      backref=db.backref('normal_rec'))
 
 
-    def __init__(self, user_id, event_id, rank, create_time):
+    def __init__(self, user_id, event_id, create_time):
         
         self.user_id     = user_id
         self.event_id    = event_id
-        self.rank        = rank
         self.create_time = create_time
         
 

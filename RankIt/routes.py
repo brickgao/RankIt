@@ -209,10 +209,18 @@ def reflectReq():
                 db.session.close()
                 return _ret
             normalEventInfo.total += 1
-            _rank = normalEventInfo.total
             normalEventRulesInfoList = normalEventRules.query.order_by(normalEventRules.id).all()
-            normalRecInfo = normalRec(_id, event_id, _rank, now_datetime)
+            normalRecInfo = normalRec(_id, event_id, now_datetime)
             db.session.add(normalRecInfo)
+            db.session.commit()
+            normalRecInfo = normalRec.query.filter_by(user_id=_id, event_id=event_id).first()
+            normalRecInfoList = normalRec.query.order_by(normalRec.id).filter_by(event_id=event_id).all()
+            _rank = 0
+            for e in normalRecInfoList:
+                _rank += 1
+                if e.user_id == _id:
+                    break
+            normalRecInfo.rank = _rank
             db.session.commit()
             for e in normalEventRulesInfoList:
                 if _rank >= e.range_begin and _rank < e.range_end:
