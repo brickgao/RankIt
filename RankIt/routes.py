@@ -208,7 +208,8 @@ def reflectReq():
                 _ret = str_misc.trans_str(normalEventInfo.early_ret, _time)
                 db.session.close()
                 return _ret
-            normalEventInfo.total += 1
+            db.engine.execute('UPDATE normal_event SET total = total + 1 WHERE id = %s',
+                             (event_id))
             normalEventRulesInfoList = normalEventRules.query.order_by(normalEventRules.id).all()
             normalRecInfo = normalRec(_id, event_id, now_datetime)
             db.session.add(normalRecInfo)
