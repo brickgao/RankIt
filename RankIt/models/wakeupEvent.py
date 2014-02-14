@@ -7,6 +7,7 @@ class wakeupEvent(db.Model):
     id               = db.Column(db.Integer, primary_key=True)
     last_update_time = db.Column(db.String(80), unique=False)
     total            = db.Column(db.Integer, unique=False)
+    last_total       = db.Column(db.Integer, unique=False)
     switch           = db.Column(db.Integer, unique=False)
     begin_time       = db.Column(db.String(80), unique=False)
     end_time         = db.Column(db.String(80), unique=False)
@@ -22,6 +23,7 @@ class wakeupEvent(db.Model):
         self.id               = 1
         self.last_update_time = last_update_time
         self.total            = total
+        self.last_total       = total
         self.switch           = 1
         self.begin_time       = begin_time
         self.end_time         = end_time
